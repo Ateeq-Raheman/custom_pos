@@ -177,9 +177,9 @@ app_license = "mit"
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "custom_pos.event.get_events"
 # }
-override_whitelisted_methods = {
-    "posawesome.posawesome.api.posapp.search_invoices_for_return": "custom_pos.api.pos_override.search_invoices_for_return"
-}
+# override_whitelisted_methods = {
+#     "posawesome.posawesome.api.posapp.search_invoices_for_return": "custom_pos.api.pos_override.search_invoices_for_return"
+# }
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
