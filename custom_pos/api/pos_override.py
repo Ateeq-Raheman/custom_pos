@@ -3,9 +3,11 @@ from frappe import _
 
 def search_invoices_for_return(doctype, txt, searchfield, start, page_len, filters):
     """
-    This function overrides POS Awesome's default behavior by:
-    - Removing already returned items from invoices instead of hiding the whole invoice.
-    - Hiding invoices where all items have been returned.
+    Custom function to filter invoices for returns in POS Awesome.
+    
+    - Shows only invoices where at least one item has been returned.
+    - Hides invoices where all items have been returned.
+    - Shows only the remaining non-returned items in partially returned invoices.
     """
     
     # Fetch all Sales Invoices that are eligible for return (not return invoices)
@@ -36,14 +38,15 @@ def search_invoices_for_return(doctype, txt, searchfield, start, page_len, filte
     filtered_invoices = []
     for invoice in invoices:
         original_items = frappe.parse_json(invoice["items"])  # Convert item data
-        if invoice["name"] in returned_items_mapping:
-            invoice["items"] = [
-                item for item in original_items
-                if item["item_code"] not in returned_items_mapping[invoice["name"]]
-            ]
+        remaining_items = [
+            item for item in original_items
+            if invoice["name"] not in returned_items_mapping or item["item_code"] not in returned_items_mapping[invoice["name"]]
+        ]
         
         # Only add the invoice if there are remaining items to return
-        if invoice["items"]:
+        if remaining_items:
+            invoice["items"] = remaining_items
             filtered_invoices.append(invoice)
 
     return filtered_invoices
+
