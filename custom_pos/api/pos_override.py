@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 
+@frappe.whitelist()
 def search_invoices_for_return(doctype, txt, searchfield, start, page_len, filters):
     """
     Custom function to filter invoices for returns in POS Awesome.
