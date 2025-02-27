@@ -2,12 +2,11 @@ import frappe
 from frappe import _
 
 @frappe.whitelist()
-def search_invoices_for_return(doctype=None, txt="", searchfield=None, start=0, page_len=20, filters=None):
+def search_invoices_for_return(txt="", start=0, page_len=20, filters=None):
     """
     Custom function to filter invoices for return in POS Awesome.
     - Excludes fully returned invoices.
     - Shows invoices with unreturned items.
-    - Filters based on `txt` search term.
     """
 
     filters = filters or {}
