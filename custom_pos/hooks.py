@@ -144,6 +144,11 @@ app_include_js = "/assets/custom_pos/js/custom.js"
 # 		"on_trash": "method"
 # 	}
 # }
+doc_events = {
+    "Sales Invoice": {
+        "validate": "custom_pos.api.pos_override.update_returned_items"
+    }
+}
 
 # Scheduled Tasks
 # ---------------
