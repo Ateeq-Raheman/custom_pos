@@ -189,6 +189,10 @@ doc_events = {
 #     "posawesome.posawesome.api.posapp.search_invoices_for_return": 
 #     "custom_pos.api.pos_override.search_invoices_for_return"
 # }
+override_whitelisted_methods = {
+    "posawesome.posawesome.api.posapp.get_sales_invoice_child_table": 
+    "custom_pos.api.hide_message.get_sales_invoice_child_table"
+}
 
 #
 # each overriding function accepts a `data` argument;
