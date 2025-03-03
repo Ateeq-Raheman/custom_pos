@@ -2,22 +2,25 @@ import frappe
 
 def update_returned_items(doc, method):
     """
-    Updates the 'custom_is_returned' field in the child table of Sales Invoice
-    when an item is returned.
+    Updates 'custom_is_returned' in Sales Invoice Item child table when an item is returned.
     """
     if doc.is_return and doc.return_against:
-        # Get the original invoice items
-        original_items = frappe.get_all("Sales Invoice Item",
-            filters={"parent": doc.return_against},
-            fields=["item_code", "qty"])
+        frappe.logger().info(f"Processing return invoice: {doc.name}, Return Against: {doc.return_against}")
 
-        # Convert list to dictionary for easy lookup
+        # Fetch original items from the parent invoice using SQL (bypassing permission restrictions)
+        original_items = frappe.db.sql("""
+            SELECT item_code, qty FROM `tabSales Invoice Item`
+            WHERE parent=%s
+        """, (doc.return_against,), as_dict=True)
+
         original_items_dict = {item["item_code"]: item["qty"] for item in original_items}
+        frappe.logger().info(f"Original items from invoice {doc.return_against}: {original_items_dict}")
 
         for item in doc.items:
-            # If the item exists in the original invoice and has a negative quantity (returned)
             if item.item_code in original_items_dict and item.qty < 0:
                 item.custom_is_returned = 1  # Mark as returned
+                frappe.logger().info(f"Item {item.item_code} marked as returned.")
             else:
                 item.custom_is_returned = 0  # Not returned
+                frappe.logger().info(f"Item {item.item_code} not marked as returned.")
 
