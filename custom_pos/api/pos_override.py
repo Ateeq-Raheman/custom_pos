@@ -3,11 +3,12 @@ import frappe
 def update_returned_items(doc, method):
     """
     Updates 'custom_is_returned' in both the returned invoice and the original sales invoice.
+    Bypasses permission restrictions.
     """
     if doc.is_return and doc.return_against:
         frappe.logger().info(f"Processing return invoice: {doc.name}, Return Against: {doc.return_against}")
 
-        # Fetch original items from the parent invoice using SQL
+        # Fetch original items from the parent invoice using SQL (bypasses permission restrictions)
         original_items = frappe.db.sql("""
             SELECT name, item_code FROM `tabSales Invoice Item`
             WHERE parent=%s
@@ -21,8 +22,13 @@ def update_returned_items(doc, method):
                 item.custom_is_returned = 1  # Mark as returned in the return invoice
                 frappe.logger().info(f"Item {item.item_code} marked as returned in return invoice.")
 
-                # Also update the original invoice's item
-                frappe.db.set_value("Sales Invoice Item", original_items_dict[item.item_code], "custom_is_returned", 1)
+                # Also update the original invoice's item (bypassing permission restrictions)
+                frappe.db.sql("""
+                    UPDATE `tabSales Invoice Item`
+                    SET custom_is_returned = 1
+                    WHERE name = %s
+                """, (original_items_dict[item.item_code],))
+
                 frappe.logger().info(f"Item {item.item_code} marked as returned in original invoice.")
 
             else:
